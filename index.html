@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7c3aed">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="description" content="SP">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+<title>SP</title>
+</head>
+<body>
+
+<div id="loginScreen" class="loginScreen">
+  <div class="loginCard">
+    <div class="eyebrow">SP</div>
+    <h2>Sign in</h2>
+    <p class="muted">Sign in once on this device. The same account can be used on other devices.</p>
+    <form id="loginForm" class="form">
+      <label>Email<input id="loginEmail" type="email" autocomplete="username" required placeholder="Email"></label>
+      <label>Password<input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Password"></label>
+      <button class="primary big" type="submit">Login</button>
+    </form>
+    <div id="loginError" class="loginError"></div>
+  </div>
+</div>
+<div id="app" class="hidden">
+  <header class="topbar">
+    <div class="brand">
+      <img id="mandalLogo" class="mandalLogo" src="./assets/sp-logo.jpeg" alt="शिवगर्जना प्रतिष्ठान logo">
+      <div>
+        <div class="eyebrow">SP</div>
+        <h1 id="mandalTitle">शिवगर्जना प्रतिष्ठान</h1>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center"><button id="themeToggle" class="iconbtn" type="button">☾ Dark</button><button id="logoutBtn" class="iconbtn" type="button">↪ Logout</button><button id="installBtn" class="iconbtn hidden" type="button">＋ Install</button></div>
+  </header>
+
+  <main>
+    <section id="dashboard" class="page active">
+      <div class="periodBar card">
+        <div><b>Dashboard period</b><span class="muted">Choose what you want to see</span></div>
+        <select id="dashPeriod"><option value="today">Today</option><option value="week">This week</option><option value="month">This month</option><option value="festival">Festival</option><option value="all">All time</option></select>
+      </div>
+      <div class="hero">
+        <div>
+          <div class="muted">Current balance</div>
+          <div id="balance" class="heroValue">₹0</div>
+          <div id="expected" class="heroSub">Expected ₹0</div>
+        </div>
+        <div class="heroActions">
+          <button class="primary" type="button" data-page="income">＋ Donation</button>
+          <button class="secondary" type="button" data-page="expense">＋ Expense</button>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="card"><span>Total income</span><b id="incomeTotal">₹0</b><small id="incomePending">₹0 pending</small></div>
+        <div class="card"><span>Total expenses</span><b id="expenseTotal">₹0</b><small id="expensePending">₹0 pending</small></div>
+        <div class="card"><span>Today received</span><b id="todayIncome">₹0</b><small id="todayExpense">Expenses ₹0</small></div>
+        <div class="card"><span>Current balance</span><b id="dashBalance">₹0</b><small>Received − Paid</small></div>
+      </div>
+      <div class="card paymentBreakdown">
+        <div class="sectionHead"><div><b>Payment mode balance</b><span class="muted">Received income − paid expenses</span></div><b id="modeNetTotal">₹0</b></div>
+        <div class="modeGrid">
+          <div><span>Cash</span><b id="cashTotal">₹0</b></div>
+          <div><span>UPI</span><b id="upiTotal">₹0</b></div>
+          <div><span>Bank</span><b id="bankTotal">₹0</b></div>
+          <div><span>Other</span><b id="otherTotal">₹0</b></div>
+        </div>
+      </div>
+      <div class="card targetCard">
+          <div class="sectionHead"><div><b>Collection target</b><span id="targetLabel" class="muted">Set a target in Settings</span></div><b id="targetValue">₹0 / ₹0</b></div>
+          <div class="progress"><i id="targetProgress"></i></div>
+        </div>
+        <div class="card"><div class="sectionHead"><div><b>Income vs expenses</b><span class="muted">Selected period</span></div></div><div id="miniChart" class="miniChart"></div></div>
+      <div class="sectionHead"><h2>Recent activity</h2><button class="textbtn" type="button" data-page="records">View all</button></div>
+      <div id="recentList" class="list"></div>
+    </section>
+
+    <section id="income" class="page">
+      <div class="sectionHead"><div><div class="eyebrow">NEW ENTRY</div><h2>Add donation</h2></div><button class="textbtn" type="button" data-page="dashboard">Cancel</button></div>
+      <form id="incomeForm" class="form">
+        <label>Donor name<input name="name" required maxlength="80" placeholder="Full name"></label>
+        <label>Mobile number<input name="mobile" inputmode="numeric" maxlength="15" placeholder="WhatsApp number"></label>
+        <div class="grid2">
+          <label>Amount (₹)<div class="amountWrap"><div class="amountPresets"><button type="button" data-amount="50">₹50</button><button type="button" data-amount="100">₹100</button><button type="button" data-amount="500">₹500</button><button type="button" data-amount="1000">₹1000</button></div><input name="amount" required inputmode="decimal" min="0.01" step="0.01" type="number" placeholder="501"></label>
+          <label>Date<input name="date" required type="date"></label>
+        </div>
+        <div class="grid2">
+          <label>Payment mode<select name="mode"><option>Cash</option><option>UPI</option><option>Bank</option><option>Other</option></select></label>
+          <label>Status<select name="status"><option>Received</option><option>Pending</option></select></label>
+        </div>
+        <label>Description / notes<textarea name="note" maxlength="200" placeholder="Optional"></textarea></label>
+        <div id="upiPreview" class="qrbox hidden"><div><b>UPI payment</b><span class="muted">Open the QR full screen and confirm payment after checking your UPI notification.</span></div><button id="showUpiQr" class="secondary" type="button">Show full-screen QR</button></div>
+        <button class="primary big" type="submit">Save & generate pawti</button>
+      </form>
+    </section>
+
+    <section id="expense" class="page">
+      <div class="sectionHead"><div><div class="eyebrow">NEW ENTRY</div><h2>Add expense</h2></div><button class="textbtn" type="button" data-page="dashboard">Cancel</button></div>
+      <form id="expenseForm" class="form">
+        <label>Paid to / vendor<input name="paidTo" required maxlength="80" placeholder="Vendor / person"></label>
+        <div class="grid2">
+          <label>Amount (₹)<div class="amountWrap"><div class="amountPresets"><button type="button" data-amount="50">₹50</button><button type="button" data-amount="100">₹100</button><button type="button" data-amount="500">₹500</button><button type="button" data-amount="1000">₹1000</button></div><input name="amount" required inputmode="decimal" min="0.01" step="0.01" type="number" placeholder="1500"></label>
+          <label>Date<input name="date" required type="date"></label>
+        </div>
+        <div class="grid2">
+          <label>Category<select name="category"><option>Decoration</option><option>Prasad / Food</option><option>Sound</option><option>Electricity</option><option>Printing</option><option>Transport</option><option>Other</option></select></label>
+          <label>Payment mode<select name="mode"><option>Cash</option><option>UPI</option><option>Bank</option><option>Other</option></select></label>
+        </div>
+        <label>Status<select name="status"><option>Paid</option><option>Pending</option></select></label>
+        <label>Description / notes<textarea name="note" maxlength="200" placeholder="Optional"></textarea></label>
+        <button class="primary big" type="submit">Save expense</button>
+      </form>
+    </section>
+
+    <section id="records" class="page">
+      <div class="sectionHead"><div><div class="eyebrow">LEDGER</div><h2>Records</h2></div></div>
+      <div class="filters">
+        <input id="search" placeholder="Search name, vendor, receipt…">
+        <select id="typeFilter"><option value="all">All</option><option value="income">Donations</option><option value="expense">Expenses</option></select>
+        <input id="fromDate" type="date"><input id="toDate" type="date"><button class="secondary" id="clearFilters" type="button">Clear filters</button>
+      </div>
+      <div class="exportRow">
+        <button class="secondary" id="exportToday" type="button">Today's log</button>
+        <button class="secondary" id="exportAll" type="button">Download all CSV</button>
+      </div>
+      <div id="recordList" class="list"></div>
+    </section>
+
+    <section id="reports" class="page">
+      <div class="sectionHead"><div><div class="eyebrow">SUMMARY</div><h2>Reports</h2></div></div>
+      <div class="reportGrid">
+        <div class="card"><span>Received income</span><b id="rReceived">₹0</b></div>
+        <div class="card"><span>Paid expenses</span><b id="rPaid">₹0</b></div>
+        <div class="card"><span>Current balance</span><b id="rBalance">₹0</b></div>
+        <div class="card"><span>Pending net</span><b id="rPending">₹0</b></div>
+      </div>
+      <div class="card reportCard">
+        <h3>Payment breakdown</h3>
+        <div id="breakdown"></div>
+      </div>
+      <div class="card reportCard">
+        <h3>Expense categories</h3>
+        <div id="categories"></div>
+      </div>
+      <button class="primary big" id="exportRange" type="button">Download filtered report</button>
+    </section>
+
+    <section id="settings" class="page">
+      <div class="sectionHead"><div><div class="eyebrow">CUSTOMIZE</div><h2>Settings</h2></div></div>
+      <form id="settingsForm" class="form">
+        <div class="card"><b>Branding</b><span class="muted">These start with your default name and logo, but you can change them anytime.</span>
+<label>Mandal name<input name="mandalName" maxlength="100" required></label>
+<label>Logo<input name="logo" type="file" accept="image/*"></label>
+<img id="settingsLogo" alt="Current logo" style="width:110px;height:110px;object-fit:cover;border-radius:16px;margin-top:10px">
+</div>
+        <div class="grid2">
+          <label>Festival year<input name="year" maxlength="20"></label>
+          <label>Contact<input name="contact" inputmode="tel" maxlength="20"></label>
+        </div>
+        <label>Address<textarea name="address" maxlength="180"></textarea></label>
+        <label>Thank-you message<textarea name="thankyou" maxlength="180"></textarea></label>
+        <label>WhatsApp preset message<textarea name="waMessage" maxlength="500" placeholder="Example: 🙏 Thank you for your contribution to {mandal}. Receipt {receipt}, amount {amount}."></textarea></label>
+        <div class="hint">Available placeholders: <b>{mandal}</b>, <b>{receipt}</b>, <b>{name}</b>, <b>{amount}</b>, <b>{mode}</b>, <b>{date}</b>, <b>{status}</b>, <b>{thankyou}</b></div>
+        <label>UPI QR image<input name="qr" type="file" accept="image/*"><span class="muted">Upload a new QR anytime. The saved QR is stored with your Firebase account.</span></label>
+        <div id="savedQr" class="qrbox hidden"><div><b>Current UPI QR</b><span class="muted">Cloud saved</span></div><img id="settingsQr" alt="Saved UPI QR"><button id="removeQr" class="danger" type="button">Remove QR</button></div>
+        <div class="grid2">
+          <label>Collection target (₹)<input name="target" type="number" min="0" step="1" placeholder="Optional"></label>
+          <label>Accent color<input name="accent" type="color" value="#7c3aed"></label>
+        </div>
+        <button class="primary big" type="submit">Save settings</button>
+      </form>
+      <div class="card dangerCard">
+        <h3>Data controls</h3>
+        <p class="muted">Records and settings are synced to your Firebase account. Export your log before clearing data if you want an extra copy.</p>
+        <div class="grid2">
+          <button id="backupData" class="secondary" type="button">Backup data</button>
+          <label class="fileBtn secondary">Restore backup<input id="restoreData" type="file" accept=".json,application/json"></label>
+        </div>
+        <button id="clearData" class="danger" type="button">Clear all records</button>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottomnav">
+    <button class="nav active" data-page="dashboard" type="button">⌂<span>Home</span></button>
+    <button class="nav" data-page="income" type="button">＋<span>Donation</span></button>
+    <button class="nav" data-page="expense" type="button">−<span>Expense</span></button>
+    <button class="nav" data-page="records" type="button">☷<span>Records</span></button>
+    <button class="nav" data-page="settings" type="button">⚙<span>Settings</span></button>
+  </nav>
+</div>
+
+<div id="upiModal" class="upiModal hidden">
+  <div class="upiFull">
+    <div class="upiHeader"><div><div class="eyebrow">UPI PAYMENT</div><h2>Scan & pay</h2><p class="muted">After paying, check your UPI notification on the mandal's device.</p></div><button id="closeUpi" class="close" type="button">×</button></div>
+    <img id="upiFullImage" class="upiFullImage" alt="Mandal UPI QR code">
+    <div class="upiConfirm">
+      <button id="upiReceived" class="primary big" type="button">✓ Payment received</button>
+      <button id="upiNotReceived" class="secondary big" type="button">Payment not received</button>
+    </div>
+  </div>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="modal" class="modal hidden"><div class="modalCard"><button id="closeModal" class="close" type="button">×</button><div id="modalContent"></div></div></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBLohxnu4tTgnGP6nAPDuLFzsAU4WtMEB4",
+  authDomain: "sp99-1907.firebaseapp.com",
+  projectId: "sp99-1907",
+  storageBucket: "sp99-1907.firebasestorage.app",
+  messagingSenderId: "345367263027",
+  appId: "1:345367263027:web:c6e7f304f09de6e1497046"
+};
+firebase.initializeApp(firebaseConfig);
+window.firebaseAuth = firebase.auth();
+window.firebaseDb = firebase.firestore();
+</script>
+<script src="app.js"></script>
+</body>
+</html>
